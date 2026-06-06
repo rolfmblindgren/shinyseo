@@ -1,21 +1,22 @@
 on:
-  schedule:
-    - cron: "0 6 * * 0"
+  push:
+    tags:
+      - "v*"
 
-name: R-CMD-check
+name: Release
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
-  R-CMD-check:
+  release:
     runs-on: ${{ matrix.config.os }}
 
     strategy:
-      fail-fast: false
+      fail-fast: true
       matrix:
         config:
           - os: ubuntu-latest
@@ -41,3 +42,13 @@ jobs:
         uses: r-lib/actions/check-r-package@v2
         with:
           upload-snapshots: true
+
+      - name: Build package tarball
+        if: matrix.config.os == 'macos-latest'
+        run: R CMD build .
+
+      - name: Upload to GitHub Release
+        if: matrix.config.os == 'macos-latest'
+        uses: softprops/action-gh-release@v2
+        with:
+          files: "*.tar.gz"
