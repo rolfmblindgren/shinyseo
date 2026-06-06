@@ -10,3 +10,5 @@
 ^.*\.tar\.gz$
 ^\.positai$
 ^\.claude$
+^\.github$
+^LLM\.md$
