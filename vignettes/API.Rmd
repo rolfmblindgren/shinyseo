@@ -13,9 +13,9 @@ This page is written so another agent can use the package without reading the so
 
 ## Exported surface
 
-- `social_meta(meta)`
-
-There are no other exported helpers.
+- `social_meta(meta)` — builds and injects metadata tags into the page `<head>` at startup.
+- `update_meta(session, title, description, url, image)` — reactively updates one or more metadata fields from the server at runtime.
+- `write_manifest(meta, path, display, start_url, background_color)` — writes a `manifest.json` to `www/` so Shiny can serve it.
 
 ## Return value
 
@@ -168,6 +168,86 @@ The function writes these tags into the returned head fragment:
 | `publisher_type` | Schema.org `publisher.@type` |
 | `in_language` | Schema.org `inLanguage` |
 | `schema` | Turns JSON-LD on or off |
+
+## Favicon and web app manifest fields
+
+These optional fields in `social_meta()` control browser icon and PWA behaviour:
+
+| Field | Tag produced |
+| --- | --- |
+| `favicon` | `<link rel="icon" type="..." href="...">` |
+| `favicon_type` | Overrides the MIME type inferred from `favicon`'s extension |
+| `apple_touch_icon` | `<link rel="apple-touch-icon" href="...">` |
+| `manifest` | `<link rel="manifest" href="...">` |
+| `theme_color` | `<meta name="theme-color" content="...">` |
+| `short_name` | Used by `write_manifest()` for the manifest `short_name` field |
+
+MIME type is inferred automatically from the file extension of `favicon` (`.ico`, `.png`, `.svg`, `.webp`, `.gif`).  Supply `favicon_type` to override.
+
+### `write_manifest()`
+
+Generates `www/manifest.json` from the same metadata object.  Call it once in `global.R`:
+
+```r
+shinyseo::write_manifest(list(
+  title            = "My App",
+  short_name       = "MyApp",
+  description      = "A Shiny web app.",
+  theme_color      = "#1a73e8",
+  favicon          = "/favicon.png",
+  apple_touch_icon = "/apple-touch-icon.png"
+))
+```
+
+Then reference the manifest from the UI:
+
+```r
+shinyseo::social_meta(list(
+  ...,
+  manifest = "/manifest.json"
+))
+```
+
+Parameters:
+
+- `meta` — same YAML path or list as `social_meta()`.
+- `path` — directory to write into.  Defaults to `"www"`.
+- `display` — PWA display mode: `"standalone"` (default), `"fullscreen"`, `"minimal-ui"`, or `"browser"`.
+- `start_url` — start URL in the manifest.  Defaults to `"/"`.
+- `background_color` — splash screen background.  Defaults to `theme_color` when set, otherwise `"#ffffff"`.
+
+## `update_meta()` — reactive metadata updates
+
+`update_meta(session, title, description, url, image)` sends a custom message to the browser that updates the live DOM without a page reload.  It is intended for multi-page or tabbed Shiny apps where the metadata should reflect the current view.
+
+### Parameters
+
+- `session` — the Shiny `session` object passed to `server`.
+- `title` — replaces `document.title`, `og:title`, and `twitter:title`.
+- `description` — replaces `meta[name="description"]`, `og:description`, and `twitter:description`.
+- `url` — replaces `link[rel="canonical"]`, `og:url`, and `twitter:url`.
+- `image` — replaces `og:image` and `twitter:image`.
+
+All parameters except `session` are optional.  Only the fields you supply are changed; omitted fields keep their current values.  If no fields are supplied the function is a no-op.
+
+### Requirements
+
+`social_meta()` must be present in the UI for the JavaScript handler to be registered.  `update_meta()` alone has no effect.
+
+### Example
+
+```r
+server <- function(input, output, session) {
+  observeEvent(input$tabs, {
+    if (input$tabs == "about") {
+      shinyseo::update_meta(session,
+        title       = "About – My App",
+        description = "Learn more about the team behind the app."
+      )
+    }
+  })
+}
+```
 
 ## Behavior notes
 

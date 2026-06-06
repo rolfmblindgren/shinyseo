@@ -3,20 +3,25 @@
 [![CRAN version](https://www.r-pkg.org/badges/version/shinyseo)](https://CRAN.R-project.org/package=shinyseo)
 [![CRAN total downloads](https://cranlogs.r-pkg.org/badges/grand-total/shinyseo?color=blue)](https://CRAN.R-project.org/package=shinyseo)
 
-`shinyseo` is a small helper package for Shiny apps that need social and search metadata.
+`shinyseo` is a small helper package for Shiny apps that need social, search, and PWA metadata.
 
 It builds one `shiny::tags$head()` fragment containing:
 
-- canonical URL
-- `description`
+- canonical URL and description
 - Open Graph tags for Facebook, LinkedIn, Slack, and similar previews
 - Twitter Card tags
+- favicon, apple-touch-icon, theme-color, and web app manifest links
 - optional schema.org JSON-LD
 - optional Bing, Google, Yandex, Baidu, Naver, Facebook, and Pinterest verification
+- arbitrary custom meta tags
 
 The package accepts either a YAML file path or a named list.
 
-If you only need the short contract: there is one exported function, `social_meta()`. It returns a `shiny::tags$head()` fragment that belongs in the UI of a Shiny app.
+Three exported functions:
+
+- `social_meta(meta)` — inject metadata into the UI at startup
+- `update_meta(session, ...)` — update title, description, url, or image reactively from the server
+- `write_manifest(meta, ...)` — generate `www/manifest.json` for PWA support
 
 ## What it does
 
@@ -27,6 +32,7 @@ When you call `social_meta()`, the package:
 3. Checks that the required fields exist.
 4. Builds HTML tags for Shiny UI.
 5. Adds JSON-LD unless you turn schema off.
+6. Registers a JavaScript handler so `update_meta()` can update tags at runtime.
 
 ## API in short
 
@@ -38,6 +44,18 @@ When you call `social_meta()`, the package:
 - missing keys use package defaults where provided
 - `schema = FALSE` disables JSON-LD output
 - any other value of `schema` keeps JSON-LD enabled
+
+`update_meta(session, title, description, url, image)`:
+
+- call from the server to update metadata without a page reload
+- only the fields you supply are changed
+- requires `social_meta()` to be present in the UI
+
+`write_manifest(meta, path, display, start_url, background_color)`:
+
+- generates `www/manifest.json` for PWA support
+- call once in `global.R` before the app starts
+- reference the result with `manifest = "/manifest.json"` in `social_meta()`
 
 ## Config cheat sheet
 
@@ -62,6 +80,13 @@ Common extras:
 | `twitter_creator` | Sets `twitter:creator` |
 | `image_alt` | Sets `og:image:alt` |
 | `twitter_image_alt` | Sets `twitter:image:alt` |
+| `favicon` | Sets `<link rel="icon">` with auto-detected MIME type |
+| `favicon_type` | Overrides the MIME type inferred from `favicon` |
+| `apple_touch_icon` | Sets `<link rel="apple-touch-icon">` |
+| `theme_color` | Sets `<meta name="theme-color">` |
+| `manifest` | Sets `<link rel="manifest">` |
+| `short_name` | Used by `write_manifest()` for the manifest short name |
+| `custom` | List of lists — each becomes an arbitrary `<meta>` tag |
 | `bing_site_verification` | Sets Bing verification |
 | `google_site_verification` | Sets Google Search Console verification |
 | `yandex_site_verification` | Sets Yandex Webmaster verification |
@@ -105,27 +130,33 @@ If you use GA4, keep that in your server or deployment config instead of in
 ## Quick use
 
 ```r
-library(shiny)
-library(shinyseo)
+# global.R — generate manifest once at startup
+shinyseo::write_manifest("meta.yml")
 
+# ui.R
 ui <- fluidPage(
-  social_meta("meta.yml"),
+  shinyseo::social_meta("meta.yml"),
   h1("My app")
 )
 
-server <- function(input, output, session) {}
-
-shinyApp(ui, server)
+# server.R — update metadata when the user navigates
+server <- function(input, output, session) {
+  observeEvent(input$tabs, {
+    shinyseo::update_meta(session, title = paste(input$tabs, "– My App"))
+  })
+}
 ```
 
-You can also pass a list directly:
+You can also pass a list directly instead of a YAML file:
 
 ```r
-social_meta(list(
-  title = "Example app",
+shinyseo::social_meta(list(
+  title       = "Example app",
   description = "A short app description.",
-  url = "https://example.no",
-  image = "https://example.no/share.png"
+  url         = "https://example.no",
+  image       = "https://example.no/share.png",
+  favicon     = "/favicon.png",
+  theme_color = "#1a73e8"
 ))
 ```
 
@@ -137,3 +168,5 @@ The long-form package docs live in vignettes:
 - [Reference guide](vignettes/REFERENCE.Rmd)
 
 If the package is installed, you can also open them with `browseVignettes("shinyseo")`.
+
+For LLM use, see [LLM.md](LLM.md).

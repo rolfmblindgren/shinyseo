@@ -15,11 +15,9 @@ It is useful when you want the page to look right in shares on Facebook, LinkedI
 
 ## Main flow
 
-1. Pass a YAML file or a named list.
-2. `social_meta()` reads the data.
-3. Default values are filled in where needed.
-4. The four required fields are checked.
-5. The function builds a `tags$head()` block with metadata.
+1. Pass a YAML file or a named list to `social_meta()` in the UI.
+2. `social_meta()` reads the data, fills in defaults, validates required fields, and builds a `tags$head()` block with metadata and a JavaScript handler.
+3. Optionally call `update_meta()` in the server to update one or more fields reactively without a page reload.
 
 ## Inputs
 
@@ -130,6 +128,22 @@ Additional fields may be included:
 
 If you set `schema = FALSE`, JSON-LD is omitted entirely.
 
+## Custom meta tags
+
+The `custom` field accepts a list of lists.  Each inner list becomes one
+`<meta>` tag; its names map directly to HTML attributes.
+
+```r
+custom = list(
+  list(name     = "viewport",  content = "width=device-width, initial-scale=1"),
+  list(property = "og:video",  content = "https://example.no/video.mp4"),
+  list(name     = "x-app-env", content = "production")
+)
+```
+
+Use `name` for standard meta tags and `property` for Open Graph-style tags.
+Any other valid HTML attribute is also accepted.
+
 ## Practical example
 
 ```r
@@ -147,6 +161,75 @@ ui <- shiny::fluidPage(
 )
 ```
 
+## Favicon and web app manifest
+
+Add favicon and PWA support by setting optional fields in the same metadata object:
+
+```r
+# global.R
+shinyseo::write_manifest(list(
+  title            = "My App",
+  short_name       = "MyApp",
+  description      = "A Shiny web app.",
+  theme_color      = "#1a73e8",
+  favicon          = "/favicon.png",
+  apple_touch_icon = "/apple-touch-icon.png"
+))
+```
+
+```r
+# ui.R
+shinyseo::social_meta(list(
+  title            = "My App",
+  description      = "A Shiny web app.",
+  url              = "https://example.no",
+  image            = "https://example.no/share.png",
+  favicon          = "/favicon.png",
+  apple_touch_icon = "/apple-touch-icon.png",
+  theme_color      = "#1a73e8",
+  manifest         = "/manifest.json"
+))
+```
+
+Place `favicon.png` and `apple-touch-icon.png` in the `www/` folder of the app.  `write_manifest()` writes `www/manifest.json` automatically.
+
+The MIME type for `favicon` is inferred from the file extension.  Supported: `.ico`, `.png`, `.svg`, `.webp`, `.gif`.  Override with `favicon_type` if needed.
+
+## Reactive metadata with `update_meta()`
+
+Call `update_meta()` in the server when the visible content changes — for example when the user switches tabs or navigates between routes.  Only the fields you supply are updated; everything else stays as set by `social_meta()`.
+
+```r
+ui <- shiny::navbarPage("My App",
+  shinyseo::social_meta(list(
+    title       = "My App",
+    description = "A multi-tab Shiny app.",
+    url         = "https://example.no",
+    image       = "https://example.no/preview.png"
+  )),
+  shiny::tabPanel("Home"),
+  shiny::tabPanel("About")
+)
+
+server <- function(input, output, session) {
+  observeEvent(input$tabs, {
+    if (input$tabs == "About") {
+      shinyseo::update_meta(session,
+        title       = "About – My App",
+        description = "Learn more about the team."
+      )
+    } else {
+      shinyseo::update_meta(session,
+        title       = "My App",
+        description = "A multi-tab Shiny app."
+      )
+    }
+  })
+}
+```
+
+`social_meta()` must be present in the UI for the JavaScript handler to be registered.
+
 ## When to use it
 
 Use the package when you want a small, tidy metadata solution in a Shiny app without building a custom metadata engine.
@@ -157,3 +240,4 @@ It is especially useful when you:
 - want to manage metadata from a YAML file
 - want the same metadata across multiple environments
 - want social sharing and search results to behave predictably
+- have tabbed or multi-route apps where metadata should reflect the current view
