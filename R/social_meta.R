@@ -37,6 +37,19 @@ social_meta <- function(meta) {
   shiny::tags$head(
     shiny::tags$link(rel="canonical", href=meta$url),
 
+    if (!is.null(meta$favicon))
+      shiny::tags$link(rel="icon", type=favicon_mime(meta$favicon, meta$favicon_type),
+                       href=meta$favicon),
+
+    if (!is.null(meta$apple_touch_icon))
+      shiny::tags$link(rel="apple-touch-icon", href=meta$apple_touch_icon),
+
+    if (!is.null(meta$manifest))
+      shiny::tags$link(rel="manifest", href=meta$manifest),
+
+    if (!is.null(meta$theme_color))
+      shiny::tags$meta(name="theme-color", content=meta$theme_color),
+
     shiny::tags$meta(name="description", content=meta$description),
     shiny::tags$meta(name="robots", content=meta$robots),
 
@@ -100,11 +113,43 @@ social_meta <- function(meta) {
     if (!is.null(meta$pinterest_domain_verification))
       shiny::tags$meta(name="p:domain_verify", content=meta$pinterest_domain_verification),
 
+    if (!is.null(meta$custom))
+      lapply(meta$custom, function(tag) do.call(shiny::tags$meta, tag)),
+
     if (!is.null(schema))
       shiny::tags$script(
         type = "application/ld+json",
         shiny::HTML(jsonlite::toJSON(schema, auto_unbox = TRUE))
-      )
+      ),
+
+    shiny::tags$script(shiny::HTML(
+      "Shiny.addCustomMessageHandler('shinyseo_update_meta', function(fields) {
+        var setMeta = function(sel, val) {
+          var el = document.querySelector(sel);
+          if (el) el.setAttribute('content', val);
+        };
+        if (fields.title) {
+          document.title = fields.title;
+          setMeta('meta[property=\"og:title\"]', fields.title);
+          setMeta('meta[name=\"twitter:title\"]', fields.title);
+        }
+        if (fields.description) {
+          setMeta('meta[name=\"description\"]', fields.description);
+          setMeta('meta[property=\"og:description\"]', fields.description);
+          setMeta('meta[name=\"twitter:description\"]', fields.description);
+        }
+        if (fields.url) {
+          var canon = document.querySelector('link[rel=\"canonical\"]');
+          if (canon) canon.setAttribute('href', fields.url);
+          setMeta('meta[property=\"og:url\"]', fields.url);
+          setMeta('meta[name=\"twitter:url\"]', fields.url);
+        }
+        if (fields.image) {
+          setMeta('meta[property=\"og:image\"]', fields.image);
+          setMeta('meta[name=\"twitter:image\"]', fields.image);
+        }
+      });"
+    ))
   )
 }
 
