@@ -2,6 +2,14 @@
   if (is.null(x)) y else x
 }
 
+is_interactive <- function() {
+  interactive()
+}
+
+ask_console <- function(prompt) {
+  readline(prompt)
+}
+
 favicon_mime <- function(path, explicit_type = NULL) {
   if (!is.null(explicit_type)) return(explicit_type)
   ext <- tolower(tools::file_ext(path))

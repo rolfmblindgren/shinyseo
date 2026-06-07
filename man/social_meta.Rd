@@ -28,6 +28,12 @@ If \code{meta} is a character string, it is treated as a YAML file
   \code{SHINYSEO_TWITTER_CREATOR} when those environment variables are set.
   The helper does not emit a \code{<title>} tag; set the document title in
   the app UI so it does not clash with an existing Shiny title.
+  Set \code{apple_mobile_web_app_capable = TRUE} to let the app run in
+  standalone mode when added to a phone's home screen (emits
+  \code{apple-mobile-web-app-capable} and \code{mobile-web-app-capable}).
+  \code{apple_mobile_web_app_title} sets the name shown under the home
+  screen icon, and \code{apple_mobile_web_app_status_bar_style} controls
+  the iOS status bar appearance.
   Optional verification fields include
   \code{bing_site_verification}, \code{google_site_verification},
   \code{yandex_site_verification}, \code{baidu_site_verification},

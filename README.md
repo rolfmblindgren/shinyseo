@@ -17,11 +17,25 @@ It builds one `shiny::tags$head()` fragment containing:
 
 The package accepts either a YAML file path or a named list.
 
-Three exported functions:
+Four exported functions:
 
+- `init_meta(path)` — interactively answer a few questions at the console and
+  write the result to a YAML file, so you can get started without reading the
+  field reference below
 - `social_meta(meta)` — inject metadata into the UI at startup
 - `update_meta(session, ...)` — update title, description, url, or image reactively from the server
 - `write_manifest(meta, ...)` — generate `www/manifest.json` for PWA support
+
+## Getting started
+
+Run `shinyseo::init_meta()` in the console. It will ask for your title,
+description, URL, image, and a handful of optional fields (favicon, theme
+colour, home screen shortcut support, and so on), then write the answers to
+`meta.yml`. Pass that file straight to `social_meta()`:
+
+```r
+shinyseo::social_meta("meta.yml")
+```
 
 ## What it does
 

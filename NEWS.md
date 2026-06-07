@@ -2,6 +2,10 @@
 
 ## New features
 
+- `init_meta(path)` — interactively answer a few questions at the console and
+  write the result to a `meta.yml` file, so new users can get started without
+  reading the field reference first.
+
 - `update_meta(session, title, description, url, image)` — update metadata
   reactively from the server without a page reload.  Useful for multi-tab and
   multi-route apps.  `social_meta()` now injects the JavaScript handler
