@@ -86,6 +86,9 @@ Common extras:
 | `theme_color` | Sets `<meta name="theme-color">` |
 | `manifest` | Sets `<link rel="manifest">` |
 | `short_name` | Used by `write_manifest()` for the manifest short name |
+| `apple_mobile_web_app_capable` | Set to `TRUE` to run standalone when added to a phone's home screen (`apple-mobile-web-app-capable` and `mobile-web-app-capable`) |
+| `apple_mobile_web_app_title` | Sets the name shown under the home screen icon (`apple-mobile-web-app-title`) |
+| `apple_mobile_web_app_status_bar_style` | Sets the iOS status bar style (`apple-mobile-web-app-status-bar-style`) |
 | `custom` | List of lists — each becomes an arbitrary `<meta>` tag |
 | `bing_site_verification` | Sets Bing verification |
 | `google_site_verification` | Sets Google Search Console verification |

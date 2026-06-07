@@ -44,6 +44,28 @@ test_that("social_meta injects theme-color and manifest", {
   expect_match(html, 'href="/manifest.json"',                fixed = TRUE)
 })
 
+test_that("social_meta injects PWA home screen meta tags", {
+  html <- htmltools::renderTags(social_meta(c(base_meta, list(
+    apple_mobile_web_app_capable = TRUE,
+    apple_mobile_web_app_title = "MyApp",
+    apple_mobile_web_app_status_bar_style = "black-translucent"
+  ))))$head
+
+  expect_match(html, 'name="apple-mobile-web-app-capable" content="yes"',          fixed = TRUE)
+  expect_match(html, 'name="mobile-web-app-capable" content="yes"',                fixed = TRUE)
+  expect_match(html, 'name="apple-mobile-web-app-title" content="MyApp"',          fixed = TRUE)
+  expect_match(html, 'name="apple-mobile-web-app-status-bar-style" content="black-translucent"', fixed = TRUE)
+})
+
+test_that("social_meta omits PWA home screen meta tags when not configured", {
+  html <- htmltools::renderTags(social_meta(base_meta))$head
+
+  expect_false(grepl('apple-mobile-web-app-capable',     html, fixed = TRUE))
+  expect_false(grepl('mobile-web-app-capable',           html, fixed = TRUE))
+  expect_false(grepl('apple-mobile-web-app-title',       html, fixed = TRUE))
+  expect_false(grepl('apple-mobile-web-app-status-bar-style', html, fixed = TRUE))
+})
+
 test_that("social_meta omits favicon tags when not configured", {
   html <- htmltools::renderTags(social_meta(base_meta))$head
 

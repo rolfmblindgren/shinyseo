@@ -18,6 +18,12 @@
   - `manifest` → `<link rel="manifest">`
   - `theme_color` → `<meta name="theme-color">`
   - `short_name` → used by `write_manifest()` for the manifest `short_name`
+  - `apple_mobile_web_app_capable` → `<meta name="apple-mobile-web-app-capable">`
+    and `<meta name="mobile-web-app-capable">`, so the app runs standalone when
+    added to a phone's home screen
+  - `apple_mobile_web_app_title` → `<meta name="apple-mobile-web-app-title">`
+  - `apple_mobile_web_app_status_bar_style` →
+    `<meta name="apple-mobile-web-app-status-bar-style">`
 
 - Custom meta tags via the `custom` field — a list of lists where each inner
   list's keys map directly to HTML attributes on a `<meta>` tag.  Supports both
