@@ -1,3 +1,14 @@
+# shinyseo 1.0.2
+
+## Bug fix
+
+- `read_meta()` (used internally by `social_meta()`, `write_manifest()`, and
+  `init_meta()`) now decodes the YAML file as raw UTF-8 bytes instead of
+  going through `yaml::read_yaml()`'s `readLines()`-based reader. Under a
+  non-UTF-8 locale (`LC_CTYPE=C`, common on minimal servers/CI runners),
+  the old reader silently stopped at the first non-ASCII character (e.g.
+  Norwegian "æøå"), dropping every field after it with no warning or error.
+
 # shinyseo 1.0.1
 
 ## Improvements
