@@ -46,21 +46,53 @@ test_that("init_meta writes answers to a YAML file", {
   expect_null(meta$twitter_site)
 })
 
-test_that("init_meta asks before overwriting an existing file, and requires an interactive session", {
+test_that("init_meta offers existing values as defaults and keeps them on Enter", {
   tmp <- tempfile()
   dir.create(tmp)
   on.exit(unlink(tmp, recursive = TRUE), add = TRUE)
   dest <- file.path(tmp, "meta.yml")
-  writeLines("title: Old", dest)
 
-  interactive_flag <- TRUE
+  yaml::write_yaml(list(
+    title       = "Old title",
+    description = "Old description",
+    url         = "https://old.example.no",
+    image       = "https://old.example.no/x.png",
+    locale      = "nb_NO",
+    theme_color = "#000000",
+    manifest    = "/manifest.json",
+    short_name  = "Old",
+    apple_mobile_web_app_capable = TRUE
+  ), dest)
+
+  prompts <- character()
   testthat::local_mocked_bindings(
-    is_interactive = function() interactive_flag,
-    ask_console    = function(prompt = "") "n"
+    is_interactive = function() TRUE,
+    ask_console    = function(prompt = "") { prompts <<- c(prompts, prompt); "" }
   )
-  suppressMessages(init_meta(dest))
-  expect_equal(yaml::read_yaml(dest)$title, "Old")
 
-  interactive_flag <- FALSE
+  suppressMessages(init_meta(dest))
+
+  meta <- yaml::read_yaml(dest)
+
+  # Pressing Enter on every prompt should keep the existing values.
+  expect_equal(meta$title, "Old title")
+  expect_equal(meta$description, "Old description")
+  expect_equal(meta$url, "https://old.example.no")
+  expect_equal(meta$image, "https://old.example.no/x.png")
+  expect_equal(meta$locale, "nb_NO")
+  expect_equal(meta$theme_color, "#000000")
+  expect_equal(meta$manifest, "/manifest.json")
+  expect_equal(meta$short_name, "Old")
+  expect_true(meta$apple_mobile_web_app_capable)
+
+  # The prompts should have shown the existing values as defaults.
+  expect_true(any(grepl("Old title", prompts, fixed = TRUE)))
+  expect_true(any(grepl("nb_NO", prompts, fixed = TRUE)))
+  expect_true(any(grepl("#000000", prompts, fixed = TRUE)))
+})
+
+test_that("init_meta requires an interactive session", {
+  testthat::local_mocked_bindings(is_interactive = function() FALSE)
+
   expect_error(init_meta(tempfile()), "interactive")
 })

@@ -1,7 +1,7 @@
 Package: shinyseo
 Type: Package
 Title: Search Engine Optimization, Social Metadata, and Site Verification Helpers for 'Shiny' Apps
-Version: 1.0.0
+Version: 1.0.1
 Authors@R: person(given="Rolf", family="Lindgren", email="rolf@grendel.no", role = c("aut", "cre"))
 Author: Rolf Lindgren [aut, cre]
 Maintainer: Rolf Lindgren <rolf@grendel.no>

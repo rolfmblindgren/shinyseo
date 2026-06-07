@@ -8,7 +8,8 @@ init_meta(path = "meta.yml")
 }
 \arguments{
 \item{path}{File to write the metadata to. Defaults to \code{"meta.yml"}.
-If the file already exists, you will be asked whether to overwrite it.}
+If the file already exists, its current values are shown as defaults —
+press Enter on any field to keep what's already there.}
 }
 \value{
 The path to the written file, invisibly.

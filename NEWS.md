@@ -1,3 +1,11 @@
+# shinyseo 1.0.1
+
+## Improvements
+
+- `init_meta()` now reads an existing meta file (if any) and shows its current
+  values as defaults for each prompt, so pressing Enter keeps what's already
+  there instead of clearing it.
+
 # shinyseo 1.0.0
 
 First stable release. The API (`social_meta()`, `update_meta()`,

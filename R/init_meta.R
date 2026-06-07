@@ -6,7 +6,8 @@
 #' \code{meta.yml} without first reading the field reference.
 #'
 #' @param path File to write the metadata to. Defaults to \code{"meta.yml"}.
-#'   If the file already exists, you will be asked whether to overwrite it.
+#'   If the file already exists, its current values are shown as defaults —
+#'   press Enter on any field to keep what's already there.
 #' @return The path to the written file, invisibly.
 #' @export
 init_meta <- function(path = "meta.yml") {
@@ -14,38 +15,39 @@ init_meta <- function(path = "meta.yml") {
     stop("init_meta() requires an interactive session.")
   }
 
-  if (file.exists(path) &&
-      !ask_yes_no(paste0(path, " already exists. Overwrite?"), default = FALSE)) {
-    message("Cancelled; ", path, " left untouched.")
-    return(invisible(path))
+  existing <- list()
+  if (file.exists(path)) {
+    existing <- read_meta(path)
+    message("Found existing ", path, " - press Enter to keep a value as is.\n")
+  } else {
+    message("Let's set up your metadata. Press Enter to skip an optional field.\n")
   }
-
-  message("Let's set up your metadata. Press Enter to skip an optional field.\n")
 
   meta <- list()
 
-  meta$title       <- ask_field("Title (required)", required = TRUE)
-  meta$description <- ask_field("Description (required)", required = TRUE)
-  meta$url         <- ask_field("Canonical URL, e.g. https://example.no (required)", required = TRUE)
-  meta$image       <- ask_field("Share image URL, e.g. https://example.no/share.png (required)", required = TRUE)
+  meta$title       <- ask_field("Title (required)", default = existing$title, required = TRUE)
+  meta$description <- ask_field("Description (required)", default = existing$description, required = TRUE)
+  meta$url         <- ask_field("Canonical URL, e.g. https://example.no (required)", default = existing$url, required = TRUE)
+  meta$image       <- ask_field("Share image URL, e.g. https://example.no/share.png (required)", default = existing$image, required = TRUE)
 
-  meta$site_name <- ask_field("Site name (optional, shown in social previews)")
-  meta$locale    <- ask_field("Locale (optional)", default = "en_US")
+  meta$site_name <- ask_field("Site name (optional, shown in social previews)", default = existing$site_name)
+  meta$locale    <- ask_field("Locale (optional)", default = existing$locale %||% "en_US")
 
-  meta$favicon          <- ask_field("Favicon path (optional, e.g. /favicon.png)")
-  meta$apple_touch_icon <- ask_field("Apple touch icon path (optional, e.g. /apple-touch-icon.png)")
-  meta$theme_color      <- ask_field("Theme colour (optional, e.g. #1a73e8)")
+  meta$favicon          <- ask_field("Favicon path (optional, e.g. /favicon.png)", default = existing$favicon)
+  meta$apple_touch_icon <- ask_field("Apple touch icon path (optional, e.g. /apple-touch-icon.png)", default = existing$apple_touch_icon)
+  meta$theme_color      <- ask_field("Theme colour (optional, e.g. #1a73e8)", default = existing$theme_color)
 
-  if (ask_yes_no("Should the app be installable as a home screen shortcut (PWA)?", default = FALSE)) {
-    meta$manifest <- "/manifest.json"
-    meta$short_name <- ask_field("Short name shown under the home screen icon (optional)")
+  pwa_default <- isTRUE(existing$apple_mobile_web_app_capable) || !is.null(existing$manifest)
+  if (ask_yes_no("Should the app be installable as a home screen shortcut (PWA)?", default = pwa_default)) {
+    meta$manifest <- existing$manifest %||% "/manifest.json"
+    meta$short_name <- ask_field("Short name shown under the home screen icon (optional)", default = existing$short_name)
     meta$apple_mobile_web_app_capable <- TRUE
-    meta$apple_mobile_web_app_title <- ask_field("Home screen title (optional, defaults to the short name or title)")
+    meta$apple_mobile_web_app_title <- ask_field("Home screen title (optional, defaults to the short name or title)", default = existing$apple_mobile_web_app_title)
     message("Note: call write_manifest() once at startup (e.g. in global.R) to generate manifest.json.")
   }
 
-  meta$twitter_site    <- ask_field("Twitter/X site handle, e.g. @example (optional)")
-  meta$twitter_creator <- ask_field("Twitter/X creator handle, e.g. @example (optional)")
+  meta$twitter_site    <- ask_field("Twitter/X site handle, e.g. @example (optional)", default = existing$twitter_site)
+  meta$twitter_creator <- ask_field("Twitter/X creator handle, e.g. @example (optional)", default = existing$twitter_creator)
 
   meta <- Filter(Negate(is.null), meta)
   meta <- Filter(function(x) !(is.character(x) && !nzchar(x)), meta)
