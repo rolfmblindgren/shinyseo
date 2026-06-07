@@ -1,3 +1,9 @@
+# shinyseo 1.0.0
+
+First stable release. The API (`social_meta()`, `update_meta()`,
+`write_manifest()`, `init_meta()`, and the `meta` field names) is now
+considered stable.
+
 # shinyseo 0.2.0
 
 ## New features
