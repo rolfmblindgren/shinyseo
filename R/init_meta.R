@@ -33,7 +33,13 @@ init_meta <- function(path = "meta.yml") {
   meta$site_name <- ask_field("Site name (optional, shown in social previews)", default = existing$site_name)
   meta$locale    <- ask_field("Locale (optional)", default = existing$locale %||% "en_US")
 
-  meta$favicon          <- ask_field("Favicon path (optional, e.g. /favicon.png)", default = existing$favicon)
+  meta$favicon          <- ask_field("Favicon path (optional, e.g. /favicon.svg or /favicon.png)", default = existing$favicon)
+  if (!is.null(meta$favicon) && grepl("\\.svg$", meta$favicon, ignore.case = TRUE)) {
+    meta$favicon_png <- ask_field(
+      "PNG favicon fallback (recommended for SVG favicons -- Chromium address bars don't render SVG icons, e.g. /favicon-32.png)",
+      default = existing$favicon_png
+    )
+  }
   meta$apple_touch_icon <- ask_field("Apple touch icon path (optional, e.g. /apple-touch-icon.png)", default = existing$apple_touch_icon)
   meta$theme_color      <- ask_field("Theme colour (optional, e.g. #1a73e8)", default = existing$theme_color)
 

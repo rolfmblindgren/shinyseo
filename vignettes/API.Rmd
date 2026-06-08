@@ -177,12 +177,16 @@ These optional fields in `social_meta()` control browser icon and PWA behaviour:
 | --- | --- |
 | `favicon` | `<link rel="icon" type="..." href="...">` |
 | `favicon_type` | Overrides the MIME type inferred from `favicon`'s extension |
+| `favicon_png` | `<link rel="icon" type="image/png" sizes="..." href="...">` — PNG fallback alongside an SVG `favicon` |
+| `favicon_png_sizes` | Overrides the `sizes` attribute on `favicon_png` (defaults to `"32x32"`) |
 | `apple_touch_icon` | `<link rel="apple-touch-icon" href="...">` |
 | `manifest` | `<link rel="manifest" href="...">` |
 | `theme_color` | `<meta name="theme-color" content="...">` |
 | `short_name` | Used by `write_manifest()` for the manifest `short_name` field |
 
 MIME type is inferred automatically from the file extension of `favicon` (`.ico`, `.png`, `.svg`, `.webp`, `.gif`).  Supply `favicon_type` to override.
+
+If `favicon` is an SVG, also set `favicon_png` to a PNG fallback. Chromium-based browsers don't render SVG favicons in the address bar and fall back to a generic globe icon without one.
 
 ### `write_manifest()`
 

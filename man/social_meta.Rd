@@ -28,6 +28,11 @@ If \code{meta} is a character string, it is treated as a YAML file
   \code{SHINYSEO_TWITTER_CREATOR} when those environment variables are set.
   The helper does not emit a \code{<title>} tag; set the document title in
   the app UI so it does not clash with an existing Shiny title.
+  If \code{favicon} points to an SVG, also set \code{favicon_png} to a PNG
+  fallback (e.g. 32x32) -- Chromium-based browsers' address bar does not
+  render SVG favicons and shows a generic globe icon without one.
+  \code{favicon_png_sizes} overrides the \code{sizes} attribute (defaults
+  to \code{"32x32"}).
   Set \code{apple_mobile_web_app_capable = TRUE} to let the app run in
   standalone mode when added to a phone's home screen (emits
   \code{apple-mobile-web-app-capable} and \code{mobile-web-app-capable}).

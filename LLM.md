@@ -253,6 +253,8 @@ shape — rather than growing a long tail of half-working vendor wrappers.
 |--------------------|----------|
 | `favicon`          | `<link rel="icon">` with auto-detected MIME type |
 | `favicon_type`     | overrides the MIME type inferred from `favicon`'s extension |
+| `favicon_png`      | **PNG fallback** `<link rel="icon" type="image/png" sizes="...">`; set this when `favicon` is an SVG — Chromium browsers don't render SVG favicons in the address bar and show a generic globe icon without a PNG fallback; also included in manifest icons |
+| `favicon_png_sizes`| overrides the `sizes` attribute on `favicon_png` (defaults to `"32x32"`) |
 | `apple_touch_icon` | `<link rel="apple-touch-icon">`; also included in manifest icons |
 | `manifest`         | `<link rel="manifest">`; typically `"/manifest.json"` |
 | `theme_color`      | `<meta name="theme-color">`; also used in manifest |
@@ -347,7 +349,8 @@ url: https://example.com
 image: https://example.com/share.png
 twitter_site: "@myhandle"
 theme_color: "#1a73e8"
-favicon: /favicon.png
+favicon: /favicon.svg
+favicon_png: /favicon-32.png
 apple_touch_icon: /apple-touch-icon.png
 manifest: /manifest.json
 ```

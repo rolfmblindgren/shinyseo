@@ -4,7 +4,10 @@
 \alias{openai_image_generator}
 \title{Build a generator that calls OpenAI's image API}
 \usage{
-openai_image_generator(api_key = Sys.getenv("OPENAI_API_KEY"), model = "gpt-image-1")
+openai_image_generator(
+  api_key = Sys.getenv("OPENAI_API_KEY"),
+  model = "gpt-image-1"
+)
 }
 \arguments{
 \item{api_key}{OpenAI API key. Defaults to the \code{OPENAI_API_KEY}
@@ -14,8 +17,8 @@ environment variable.}
 }
 \value{
 A function \code{function(prompt, kind)} that POSTs to
-\code{https://api.openai.com/v1/images/generations} and returns the
-generated image as a raw vector of bytes.
+  \code{https://api.openai.com/v1/images/generations} and returns the
+  generated image as a raw vector of bytes.
 }
 \description{
 Returns a function suitable for the \code{generator} argument of

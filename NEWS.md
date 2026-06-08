@@ -1,6 +1,13 @@
 # shinyseo 1.2.0
 
-## New feature
+## New features
+
+- New `favicon_png` (and `favicon_png_sizes`) fields for `social_meta()`,
+  `write_manifest()`, and `init_meta()`. Add a PNG fallback alongside an SVG
+  `favicon`: Chromium-based browsers (Chrome, Edge, Comet, etc.) don't render
+  SVG favicons in the address bar and fall back to a generic globe icon without
+  one, even though the browser tab shows the SVG correctly.
+  `favicon_png_sizes` defaults to `"32x32"`.
 
 - Added `openai_image_generator()`, a ready-made `generator` for
   `generate_assets()` that calls OpenAI's image API (`gpt-image-1` by

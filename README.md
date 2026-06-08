@@ -151,6 +151,8 @@ Common extras:
 | `twitter_image_alt` | Sets `twitter:image:alt` |
 | `favicon` | Sets `<link rel="icon">` with auto-detected MIME type |
 | `favicon_type` | Overrides the MIME type inferred from `favicon` |
+| `favicon_png` | Adds a PNG `<link rel="icon">` fallback — set this when `favicon` is an SVG; Chromium address bars don't render SVG favicons and show a generic globe icon without a PNG fallback |
+| `favicon_png_sizes` | Overrides the `sizes` attribute on `favicon_png` (defaults to `"32x32"`) |
 | `apple_touch_icon` | Sets `<link rel="apple-touch-icon">` |
 | `theme_color` | Sets `<meta name="theme-color">` |
 | `manifest` | Sets `<link rel="manifest">` |

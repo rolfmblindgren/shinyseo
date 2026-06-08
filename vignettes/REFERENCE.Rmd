@@ -172,7 +172,8 @@ shinyseo::write_manifest(list(
   short_name       = "MyApp",
   description      = "A Shiny web app.",
   theme_color      = "#1a73e8",
-  favicon          = "/favicon.png",
+  favicon          = "/favicon.svg",
+  favicon_png      = "/favicon-32.png",
   apple_touch_icon = "/apple-touch-icon.png"
 ))
 ```
@@ -184,16 +185,21 @@ shinyseo::social_meta(list(
   description      = "A Shiny web app.",
   url              = "https://example.no",
   image            = "https://example.no/share.png",
-  favicon          = "/favicon.png",
+  favicon          = "/favicon.svg",
+  favicon_png      = "/favicon-32.png",
   apple_touch_icon = "/apple-touch-icon.png",
   theme_color      = "#1a73e8",
   manifest         = "/manifest.json"
 ))
 ```
 
-Place `favicon.png` and `apple-touch-icon.png` in the `www/` folder of the app.  `write_manifest()` writes `www/manifest.json` automatically.
+Place the icon files in the `www/` folder of the app.  `write_manifest()` writes `www/manifest.json` automatically.
 
 The MIME type for `favicon` is inferred from the file extension.  Supported: `.ico`, `.png`, `.svg`, `.webp`, `.gif`.  Override with `favicon_type` if needed.
+
+### SVG favicons need a PNG fallback
+
+If `favicon` is an SVG, also set `favicon_png` (optionally with `favicon_png_sizes`, default `"32x32"`).  Chromium-based browsers (Chrome, Edge, Comet, etc.) don't render SVG favicons in the address bar -- without a PNG fallback the address bar shows a generic globe icon even though the browser tab displays the SVG correctly.  `write_manifest()` also includes `favicon_png` in the generated `manifest.json` icons.
 
 ## Reactive metadata with `update_meta()`
 

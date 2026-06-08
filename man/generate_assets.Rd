@@ -29,9 +29,9 @@ Defaults to all three: \code{c("favicon", "apple_touch_icon", "image")}.}
 }
 \value{
 The updated \code{meta} list, with newly generated fields set to
-paths under \code{path} (e.g. \code{"/favicon.png"}). Fields already
-present in \code{meta} are left untouched. Write the result back with
-\code{yaml::write_yaml()} to persist it.
+  paths under \code{path} (e.g. \code{"/favicon.png"}). Fields already
+  present in \code{meta} are left untouched. Write the result back with
+  \code{yaml::write_yaml()} to persist it.
 }
 \description{
 Looks for missing favicon, Apple touch icon, and share image fields in

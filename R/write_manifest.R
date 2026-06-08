@@ -69,6 +69,13 @@ write_manifest <- function(meta, path = "www", display = "standalone",
       type  = "image/png"
     )))
   }
+  if (!is.null(meta$favicon_png)) {
+    icons <- c(icons, list(list(
+      src   = meta$favicon_png,
+      sizes = meta$favicon_png_sizes %||% "32x32",
+      type  = "image/png"
+    )))
+  }
   if (length(icons)) {
     manifest$icons <- icons
   }
