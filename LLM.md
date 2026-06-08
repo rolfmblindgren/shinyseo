@@ -97,29 +97,39 @@ Parameters:
 ### `generate_assets(meta, generator, path, assets)`
 
 Fills in a missing `favicon`, `apple_touch_icon`, or `image` by calling a
-**caller-supplied** `generator` function — shinyseo does not call any
-image-generation service itself, so it has no vendor dependency, API key, or
-running cost of its own.  Use this once at setup time (e.g. from the console
-or a setup script), not from `ui`/`server`.
+`generator` function — either the built-in `openai_image_generator()`, or
+one you write yourself against whatever LLM/image API you have access to.
+shinyseo itself makes no network calls and has no vendor dependency; all of
+that lives behind the `generator` you choose to pass in.  Use this once at
+setup time (e.g. from the console or a setup script), not from `ui`/`server`.
 
 ```r
 meta <- shinyseo::read_meta("meta.yaml")  # or build the list directly
 
+meta <- shinyseo::generate_assets(meta,
+  generator = shinyseo::openai_image_generator()
+)
+
+yaml::write_yaml(meta, "meta.yaml")
+```
+
+Or write your own generator against another service:
+
+```r
 meta <- shinyseo::generate_assets(meta, generator = function(prompt, kind) {
   # Your own code against whatever LLM/image API you have access to.
   # `kind` is "favicon", "apple_touch_icon", or "image" — branch on it
   # to vary size, aspect ratio, or style.
   # Return either a raw vector of image bytes or a path to a file on disk.
 })
-
-yaml::write_yaml(meta, "meta.yaml")
 ```
 
 Parameters:
 - `meta` — same YAML path or list as `social_meta()`
-- `generator` — a function `function(prompt, kind)` that talks to the
-  caller's own LLM/image-generation API and returns either a raw vector of
-  image bytes or a single file path
+- `generator` — a function `function(prompt, kind)` that talks to an
+  LLM/image-generation API and returns either a raw vector of image bytes
+  or a single file path. `openai_image_generator()` builds one of these for
+  you; see below.
 - `path` — directory to write generated files into, default `"www"`
 - `assets` — which fields to fill in if missing; defaults to all three:
   `c("favicon", "apple_touch_icon", "image")`
@@ -134,6 +144,75 @@ Behaviour:
   it returns a file path, the original extension is kept.
 - The function does not persist `meta` — write it back yourself (e.g. with
   `yaml::write_yaml()`) if you want the generated paths to stick.
+
+---
+
+### `openai_image_generator(api_key, model)`
+
+Builds a ready-made `generator` for `generate_assets()` that calls OpenAI's
+image API (`https://api.openai.com/v1/images/generations`, model
+`"gpt-image-1"` by default) and returns the generated image as raw bytes.
+
+```r
+generator <- shinyseo::openai_image_generator()       # uses OPENAI_API_KEY
+generator <- shinyseo::openai_image_generator(api_key = "sk-...")
+```
+
+Parameters:
+- `api_key` — OpenAI API key; defaults to the `OPENAI_API_KEY` environment
+  variable
+- `model` — OpenAI image model to call; defaults to `"gpt-image-1"`
+
+Notes:
+- Requires the `httr` package (in `Suggests`). It is loaded with
+  `requireNamespace()` only when you call this constructor, so it costs
+  nothing if you never use OpenAI generation.
+- Calling the constructor makes no network request by itself — it just
+  builds and returns the `function(prompt, kind)` that `generate_assets()`
+  will call.
+- This is the *only* generator shinyseo ships built-in. See "Contributing a
+  generator" below for why, and for how to add support for another provider.
+
+---
+
+## Contributing a generator
+
+shinyseo ships exactly one built-in generator, `openai_image_generator()`,
+because OpenAI's image API is a clean fit for this job: one endpoint, one
+request shape, raster image bytes back.
+
+Not every popular LLM vendor fits that shape. Notably, **Claude/Anthropic
+has no image-generation API** — Claude can *see* images (vision input) and
+can *write code* that draws simple graphics (e.g. SVG or matplotlib via the
+code-execution tool), but it cannot generate raster images the way OpenAI's
+`gpt-image-1`/DALL-E or Adobe Firefly can. A "Claude generator" parallel to
+`openai_image_generator()` isn't possible as a thin wrapper around an
+image-generation endpoint, because no such endpoint exists. shinyseo
+therefore does not ship one; if you want Claude involved at all, the
+realistic options are using it to draft prompts or write SVG markup that
+some other renderer turns into a raster image — both of which are better
+suited to a caller-supplied `generator` than to a one-size-fits-all built-in.
+
+If you'd like to add a built-in generator for another provider that *does*
+generate images, contributions are welcome on
+<https://github.com/rolfmblindgren/grendelMeta>. To keep things tidy:
+
+- Name it `<provider>_image_generator(...)`, e.g. `firefly_image_generator()`.
+- Put it in its own file, `R/<provider>_image_generator.R`.
+- Match the existing shape: the constructor takes provider-specific
+  arguments (at minimum an `api_key`, defaulting to a sensible environment
+  variable) and returns a `function(prompt, kind)` that returns raw image
+  bytes or a file path — the same contract `generate_assets()` already
+  expects from any `generator`.
+- Gate any new HTTP/JSON dependency behind `requireNamespace()` and add it
+  to `Suggests`, not `Imports` — shinyseo's core functionality must keep
+  working with no vendor packages installed.
+- Document it in `LLM.md` and `README.md` next to `openai_image_generator()`,
+  following the same structure.
+
+This keeps every built-in generator held to the same bar — a real
+image-generation API behind it, an optional dependency, and a consistent
+shape — rather than growing a long tail of half-working vendor wrappers.
 
 ---
 
@@ -331,6 +410,10 @@ server <- function(input, output, session) {
   and writes files to disk.  Run it once at setup time and persist the
   result.
 - Do not expect `generate_assets()` to call any LLM or image API on its
-  own — it has no built-in vendor integration.  The caller's `generator`
-  function is responsible for talking to OpenAI, Adobe Firefly, a local
-  model, or whatever else the caller has access to.
+  own — `generate_assets()` itself has no vendor integration.  Pass it
+  either the built-in `openai_image_generator()` or your own `generator`
+  function written against whatever service you have access to (Adobe
+  Firefly, a local model, and so on).
+- Do not assume a "Claude generator" exists or could be added as a thin
+  wrapper like `openai_image_generator()` — Claude/Anthropic has no
+  image-generation API.  See "Contributing a generator" above.

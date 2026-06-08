@@ -2,6 +2,7 @@
 
 export(generate_assets)
 export(init_meta)
+export(openai_image_generator)
 export(social_meta)
 export(update_meta)
 export(write_manifest)

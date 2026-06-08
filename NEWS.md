@@ -1,3 +1,21 @@
+# shinyseo 1.2.0
+
+## New feature
+
+- Added `openai_image_generator()`, a ready-made `generator` for
+  `generate_assets()` that calls OpenAI's image API (`gpt-image-1` by
+  default) and returns the generated image bytes. It is shinyseo's only
+  built-in generator: OpenAI's image API is a clean fit for this job (one
+  endpoint, one request shape, raster bytes back), and the `httr` package
+  it needs is an optional `Suggests` dependency loaded only when the
+  constructor is called.
+
+  Other LLM vendors are welcome as community-contributed generators -- see
+  the new "Contributing a generator" section in `LLM.md` for the shape a
+  contribution should take. Notably, Claude/Anthropic has no
+  image-generation API (it can see images but not generate them), so no
+  "Claude generator" is shipped or planned as a parallel to the OpenAI one.
+
 # shinyseo 1.1.0
 
 ## New feature

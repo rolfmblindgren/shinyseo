@@ -17,7 +17,7 @@ It builds one `shiny::tags$head()` fragment containing:
 
 The package accepts either a YAML file path or a named list.
 
-Five exported functions:
+Six exported functions:
 
 - `init_meta(path)` — interactively answer a few questions at the console and
   write the result to a YAML file, so you can get started without reading the
@@ -27,7 +27,9 @@ Five exported functions:
 - `write_manifest(meta, ...)` — generate `www/manifest.json` for PWA support
 - `generate_assets(meta, generator, ...)` — fill in a missing favicon, Apple
   touch icon, or share image by calling your own LLM/image-generation
-  function
+  function, or one of the built-in generators below
+- `openai_image_generator(api_key, model)` — a ready-made `generator` for
+  `generate_assets()` that calls OpenAI's image API
 
 ## Getting started
 
@@ -77,21 +79,51 @@ When you call `social_meta()`, the package:
 `generate_assets(meta, generator, path, assets)`:
 
 - fills in a missing `favicon`, `apple_touch_icon`, or `image` by calling
-  a `generator` function *you* supply — shinyseo has no built-in LLM or
-  image-generation integration of its own, so there's no extra dependency,
-  API key, or running cost from the package
-- `generator` is `function(prompt, kind)`; write it against whatever
-  LLM/image API you already have access to, and return either raw image
-  bytes or a path to a file on disk
+  a `generator` function — either one you write yourself, or a built-in
+  one such as `openai_image_generator()`
+- `generator` is `function(prompt, kind)`; it talks to whatever LLM/image
+  API it's written against, and returns either raw image bytes or a path
+  to a file on disk
 - only missing fields are generated; existing values are left untouched
 - run it once at setup time (e.g. from the console), then persist the
   updated `meta` with `yaml::write_yaml()`
 
 ```r
+meta <- shinyseo::generate_assets(meta,
+  generator = shinyseo::openai_image_generator()
+)
+yaml::write_yaml(meta, "meta.yml")
+```
+
+Or supply your own, against whatever service you already have access to:
+
+```r
 meta <- shinyseo::generate_assets(meta, generator = function(prompt, kind) {
-  # your own call to OpenAI, Adobe Firefly, a local model, ...
+  # your own call to Adobe Firefly, a local model, ...
 })
 yaml::write_yaml(meta, "meta.yml")
+```
+
+`openai_image_generator(api_key, model)`:
+
+- builds a ready-made `generator` for `generate_assets()` that calls
+  OpenAI's image API (`gpt-image-1` by default) and returns the generated
+  image bytes
+- `api_key` defaults to the `OPENAI_API_KEY` environment variable
+- requires the `httr` package, but only loads it (via `requireNamespace()`)
+  when you call this constructor — it costs nothing if you never use it
+- shinyseo ships only this one built-in generator. OpenAI's image API is a
+  straightforward fit for the job; most other LLM vendors either don't
+  generate images at all (e.g. Claude/Anthropic, which can *see* images but
+  not generate them) or need enough vendor-specific glue that they're
+  better suited to a community-contributed `generator` — see
+  [LLM.md](LLM.md#contributing-a-generator) for the shape a contribution
+  should take
+
+```r
+meta <- shinyseo::generate_assets(meta,
+  generator = shinyseo::openai_image_generator(api_key = "sk-...")
+)
 ```
 
 ## Config cheat sheet
