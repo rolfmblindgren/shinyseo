@@ -94,6 +94,49 @@ Parameters:
 
 ---
 
+### `generate_assets(meta, generator, path, assets)`
+
+Fills in a missing `favicon`, `apple_touch_icon`, or `image` by calling a
+**caller-supplied** `generator` function — shinyseo does not call any
+image-generation service itself, so it has no vendor dependency, API key, or
+running cost of its own.  Use this once at setup time (e.g. from the console
+or a setup script), not from `ui`/`server`.
+
+```r
+meta <- shinyseo::read_meta("meta.yaml")  # or build the list directly
+
+meta <- shinyseo::generate_assets(meta, generator = function(prompt, kind) {
+  # Your own code against whatever LLM/image API you have access to.
+  # `kind` is "favicon", "apple_touch_icon", or "image" — branch on it
+  # to vary size, aspect ratio, or style.
+  # Return either a raw vector of image bytes or a path to a file on disk.
+})
+
+yaml::write_yaml(meta, "meta.yaml")
+```
+
+Parameters:
+- `meta` — same YAML path or list as `social_meta()`
+- `generator` — a function `function(prompt, kind)` that talks to the
+  caller's own LLM/image-generation API and returns either a raw vector of
+  image bytes or a single file path
+- `path` — directory to write generated files into, default `"www"`
+- `assets` — which fields to fill in if missing; defaults to all three:
+  `c("favicon", "apple_touch_icon", "image")`
+
+Behaviour:
+- Only fields that are *missing* from `meta` are generated — existing values
+  are left untouched and the generator is not called for them.
+- Generated files are written as `favicon.<ext>`, `apple-touch-icon.<ext>`,
+  or `share-image.<ext>` under `path`, and `meta` is updated with `"/"`-
+  prefixed paths to them (e.g. `"/favicon.png"`).
+- If the generator returns a raw vector, the file is written as `.png`. If
+  it returns a file path, the original extension is kept.
+- The function does not persist `meta` — write it back yourself (e.g. with
+  `yaml::write_yaml()`) if you want the generated paths to stick.
+
+---
+
 ## Complete field reference
 
 ### Required
@@ -283,3 +326,11 @@ server <- function(input, output, session) {
   tags will confuse crawlers.
 - The package does not emit a `<title>` tag.  Set the page title via the
   Shiny UI (e.g. the `title` argument of `navbarPage()` or `fluidPage()`).
+- Do not call `generate_assets()` from `ui`/`server` — it makes (potentially
+  slow, costly) calls to whatever service the caller's `generator` talks to,
+  and writes files to disk.  Run it once at setup time and persist the
+  result.
+- Do not expect `generate_assets()` to call any LLM or image API on its
+  own — it has no built-in vendor integration.  The caller's `generator`
+  function is responsible for talking to OpenAI, Adobe Firefly, a local
+  model, or whatever else the caller has access to.

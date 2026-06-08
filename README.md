@@ -17,7 +17,7 @@ It builds one `shiny::tags$head()` fragment containing:
 
 The package accepts either a YAML file path or a named list.
 
-Four exported functions:
+Five exported functions:
 
 - `init_meta(path)` — interactively answer a few questions at the console and
   write the result to a YAML file, so you can get started without reading the
@@ -25,6 +25,9 @@ Four exported functions:
 - `social_meta(meta)` — inject metadata into the UI at startup
 - `update_meta(session, ...)` — update title, description, url, or image reactively from the server
 - `write_manifest(meta, ...)` — generate `www/manifest.json` for PWA support
+- `generate_assets(meta, generator, ...)` — fill in a missing favicon, Apple
+  touch icon, or share image by calling your own LLM/image-generation
+  function
 
 ## Getting started
 
@@ -70,6 +73,26 @@ When you call `social_meta()`, the package:
 - generates `www/manifest.json` for PWA support
 - call once in `global.R` before the app starts
 - reference the result with `manifest = "/manifest.json"` in `social_meta()`
+
+`generate_assets(meta, generator, path, assets)`:
+
+- fills in a missing `favicon`, `apple_touch_icon`, or `image` by calling
+  a `generator` function *you* supply — shinyseo has no built-in LLM or
+  image-generation integration of its own, so there's no extra dependency,
+  API key, or running cost from the package
+- `generator` is `function(prompt, kind)`; write it against whatever
+  LLM/image API you already have access to, and return either raw image
+  bytes or a path to a file on disk
+- only missing fields are generated; existing values are left untouched
+- run it once at setup time (e.g. from the console), then persist the
+  updated `meta` with `yaml::write_yaml()`
+
+```r
+meta <- shinyseo::generate_assets(meta, generator = function(prompt, kind) {
+  # your own call to OpenAI, Adobe Firefly, a local model, ...
+})
+yaml::write_yaml(meta, "meta.yml")
+```
 
 ## Config cheat sheet
 

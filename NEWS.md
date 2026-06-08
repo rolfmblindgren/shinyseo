@@ -1,3 +1,15 @@
+# shinyseo 1.1.0
+
+## New feature
+
+- Added `generate_assets()`, which fills in a missing `favicon`,
+  `apple_touch_icon`, or `image` by calling a caller-supplied `generator`
+  function. shinyseo does not integrate with any particular LLM or
+  image-generation service itself -- `generator` is the caller's own
+  function, written against whatever API they already have access to (OpenAI,
+  Adobe Firefly, a local model, and so on). This keeps the package free of
+  any vendor dependency, API key, or running cost of its own.
+
 # shinyseo 1.0.2
 
 ## Bug fix
