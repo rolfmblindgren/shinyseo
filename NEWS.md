@@ -44,6 +44,10 @@
   a generator (PNG, JPEG, GIF, WebP) from their magic numbers instead of
   assuming PNG.
 
+- `openai_image_generator()` reports the HTTP status line when an error
+  response is not JSON (e.g. HTML from a proxy), instead of failing with a
+  parse error, and rejects unknown asset kinds with a clear message.
+
 - `DESCRIPTION` no longer declares `LazyData` (the package has no data
   directory), and its `URL`/`BugReports` now point at the package's actual
   GitHub repository.

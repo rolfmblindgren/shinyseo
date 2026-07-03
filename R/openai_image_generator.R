@@ -39,7 +39,8 @@ openai_image_generator <- function(api_key = Sys.getenv("OPENAI_API_KEY"),
     size <- switch(kind,
       favicon          = "1024x1024",
       apple_touch_icon = "1024x1024",
-      image            = "1536x1024"
+      image            = "1536x1024",
+      stop("Unknown asset kind: ", kind)
     )
 
     response <- httr::POST(
@@ -49,13 +50,18 @@ openai_image_generator <- function(api_key = Sys.getenv("OPENAI_API_KEY"),
       body = list(model = model, prompt = prompt, size = size, n = 1L)
     )
 
-    parsed <- httr::content(response, as = "parsed", type = "application/json")
-
     if (httr::http_error(response)) {
+      # Error bodies are usually JSON, but a proxy or gateway may answer
+      # with HTML; fall back to the status line rather than a parse error.
+      detail <- tryCatch(
+        httr::content(response, as = "parsed", type = "application/json")$error$message,
+        error = function(e) NULL
+      )
       stop("OpenAI image generation failed: ",
-           parsed$error$message %||% httr::http_status(response)$message)
+           detail %||% httr::http_status(response)$message)
     }
 
+    parsed <- httr::content(response, as = "parsed", type = "application/json")
     jsonlite::base64_dec(parsed$data[[1L]]$b64_json)
   }
 }
