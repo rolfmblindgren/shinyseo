@@ -80,14 +80,24 @@ From there:
   pressing Enter keeps the current value.
 - **`generate_assets()`** (`R/generate_assets.R`) fills in a missing
   `favicon`, `apple_touch_icon`, or `image` by calling a **caller-supplied**
-  `generator(prompt, kind)` function — the package has no LLM/image-API
-  integration of its own (no extra dependency, API key, or vendor lock-in;
-  see `LLM.md` for the rationale). It only builds prompts, dispatches to
+  `generator(prompt, kind)` function — the function itself is
+  vendor-neutral (no hard dependency, API key, or vendor lock-in; see
+  `LLM.md` for the rationale). It only builds prompts, dispatches to
   `generator`, and writes the returned bytes/file to `path` (default
   `"www"`) under a fixed filename per `kind`
   (`favicon`/`apple-touch-icon`/`share-image`). Run it once at setup time,
   not from `ui`/`server`, and persist the returned `meta` yourself (e.g.
   `yaml::write_yaml()`).
+- **`openai_image_generator()`** (`R/openai_image_generator.R`) is the one
+  built-in generator: a constructor returning a `function(prompt, kind)`
+  that POSTs to OpenAI's image API and returns raw image bytes. It is
+  deliberately the *only* bundled generator — `httr` stays in `Suggests`
+  and is loaded via `requireNamespace()` only when the constructor is
+  called, so keep it optional; don't promote `httr` to `Imports`. Other
+  vendors belong as community contributions per the "Contributing a
+  generator" section of `LLM.md`. Anthropic/Claude has no image-generation
+  API, so a "Claude generator" is neither shipped nor planned — don't add
+  one.
 
 `R/utils.R` holds small shared helpers (`%||%`, `is_interactive()`,
 `ask_console()`, `favicon_mime()`).
@@ -98,8 +108,11 @@ Tests use `testthat` edition 3 (`Config/testthat/edition: 3` in
 `DESCRIPTION`) and `htmltools::renderTags()` to render the `shiny::tags$head()`
 fragment to HTML and assert on substrings (see `test-social_meta.R` for the
 pattern). Test files map roughly 1:1 to feature areas rather than to source
-files (`test-custom_meta.R`, `test-favicon.R`, `test-init_meta.R`,
-`test-social_meta.R`, `test-update_meta.R`).
+files (`test-custom_meta.R`, `test-favicon.R`, `test-generate_assets.R`,
+`test-init_meta.R`, `test-openai_image_generator.R`, `test-social_meta.R`,
+`test-update_meta.R`). Tests touching optional dependencies guard with
+`skip_if_not_installed("httr")` and never hit the network — they test the
+constructor and argument validation only.
 
 ## Style
 
