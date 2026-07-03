@@ -20,8 +20,9 @@ Inject social metadata into Shiny UI
 }
 \details{
 If \code{meta} is a character string, it is treated as a YAML file
-  path and read with \code{yaml::read_yaml()}. Set \code{schema = FALSE} to
-  suppress JSON-LD output. \code{bing_site_verification} falls back to
+  path and decoded as UTF-8 regardless of the active locale. Set the
+  \code{schema} field in \code{meta} to \code{FALSE} to suppress JSON-LD
+  output. \code{bing_site_verification} falls back to
   \code{SHINYSEO_BING_SITE_VERIFICATION} when that environment variable is
   set. \code{twitter_site} and \code{twitter_creator} fall back to
   \code{SHINYSEO_TWITTER_SITE} and
