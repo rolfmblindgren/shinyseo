@@ -83,10 +83,24 @@ asset_filename <- function(kind) {
   )
 }
 
+raw_image_ext <- function(bytes) {
+  starts_with <- function(...) {
+    prefix <- as.raw(c(...))
+    length(bytes) >= length(prefix) && identical(bytes[seq_along(prefix)], prefix)
+  }
+  if (starts_with(0x89, 0x50, 0x4e, 0x47)) return("png")
+  if (starts_with(0xff, 0xd8, 0xff))       return("jpg")
+  if (starts_with(0x47, 0x49, 0x46, 0x38)) return("gif")
+  if (length(bytes) >= 12L &&
+      identical(bytes[1:4],  as.raw(c(0x52, 0x49, 0x46, 0x46))) &&
+      identical(bytes[9:12], as.raw(c(0x57, 0x45, 0x42, 0x50)))) return("webp")
+  "png"
+}
+
 write_generated_asset <- function(result, kind, path) {
   if (is.raw(result)) {
     bytes <- result
-    ext   <- "png"
+    ext   <- raw_image_ext(bytes)
   } else if (is.character(result) && length(result) == 1L) {
     if (!file.exists(result)) {
       stop("generator() returned a path that does not exist: ", result)

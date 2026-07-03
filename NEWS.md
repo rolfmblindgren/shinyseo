@@ -40,6 +40,10 @@
   `twitter:image:alt` when the share image is replaced at runtime, instead
   of leaving values that described the old image.
 
+- `generate_assets()` now detects the image format of raw bytes returned by
+  a generator (PNG, JPEG, GIF, WebP) from their magic numbers instead of
+  assuming PNG.
+
 - `DESCRIPTION` no longer declares `LazyData` (the package has no data
   directory), and its `URL`/`BugReports` now point at the package's actual
   GitHub repository.

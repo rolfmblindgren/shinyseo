@@ -67,6 +67,22 @@ test_that("generate_assets accepts a file path from the generator and keeps its 
   expect_true(file.exists(file.path(tmp, "share-image.jpg")))
 })
 
+test_that("generate_assets detects the format of raw bytes from magic numbers", {
+  tmp <- tempfile()
+  dir.create(tmp)
+  on.exit(unlink(tmp, recursive = TRUE), add = TRUE)
+
+  meta_without_image <- base_meta
+  meta_without_image$image <- NULL
+
+  generator <- function(prompt, kind) as.raw(c(0xff, 0xd8, 0xff, 0xe0))
+
+  meta <- generate_assets(meta_without_image, generator, path = tmp, assets = "image")
+
+  expect_equal(meta$image, "/share-image.jpg")
+  expect_true(file.exists(file.path(tmp, "share-image.jpg")))
+})
+
 test_that("generate_assets validates the assets argument", {
   expect_error(
     generate_assets(base_meta, function(...) NULL, assets = "logo"),
