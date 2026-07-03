@@ -176,6 +176,16 @@ social_meta <- function(meta) {
         if (fields.image) {
           setMeta('meta[property=\"og:image\"]', fields.image);
           setMeta('meta[name=\"twitter:image\"]', fields.image);
+          // Width, height, type, and alt described the old image; drop them
+          // rather than leave stale values on the new one.
+          ['meta[property=\"og:image:width\"]',
+           'meta[property=\"og:image:height\"]',
+           'meta[property=\"og:image:type\"]',
+           'meta[property=\"og:image:alt\"]',
+           'meta[name=\"twitter:image:alt\"]'].forEach(function(sel) {
+            var el = document.querySelector(sel);
+            if (el) el.parentNode.removeChild(el);
+          });
         }
       });"
     ))

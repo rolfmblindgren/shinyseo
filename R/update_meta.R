@@ -13,7 +13,9 @@
 #' @param url New canonical URL.  Also updates \code{og:url} and
 #'   \code{twitter:url}.
 #' @param image New share image URL.  Also updates \code{og:image} and
-#'   \code{twitter:image}.
+#'   \code{twitter:image}, and removes any \code{og:image:width},
+#'   \code{og:image:height}, \code{og:image:type}, \code{og:image:alt}, and
+#'   \code{twitter:image:alt} tags, since those described the old image.
 #' @return Called for its side-effect; returns \code{invisible(NULL)}.
 #' @export
 update_meta <- function(session, title = NULL, description = NULL,

@@ -35,6 +35,11 @@
 - `favicon_mime()` now recognises `.jpg`/`.jpeg` favicons as `image/jpeg`
   instead of falling back to `image/x-icon`.
 
+- `update_meta()`'s client-side handler now removes `og:image:width`,
+  `og:image:height`, `og:image:type`, `og:image:alt`, and
+  `twitter:image:alt` when the share image is replaced at runtime, instead
+  of leaving values that described the old image.
+
 - `DESCRIPTION` no longer declares `LazyData` (the package has no data
   directory), and its `URL`/`BugReports` now point at the package's actual
   GitHub repository.

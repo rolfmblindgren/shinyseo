@@ -25,7 +25,9 @@ update_meta(
 \code{twitter:url}.}
 
 \item{image}{New share image URL.  Also updates \code{og:image} and
-\code{twitter:image}.}
+\code{twitter:image}, and removes any \code{og:image:width},
+\code{og:image:height}, \code{og:image:type}, \code{og:image:alt}, and
+\code{twitter:image:alt} tags, since those described the old image.}
 }
 \value{
 Called for its side-effect; returns \code{invisible(NULL)}.
