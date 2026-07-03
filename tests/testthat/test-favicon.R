@@ -21,6 +21,8 @@ test_that("social_meta infers correct MIME types", {
   expect_equal(favicon_mime("/favicon.svg"),  "image/svg+xml")
   expect_equal(favicon_mime("/favicon.webp"), "image/webp")
   expect_equal(favicon_mime("/favicon.gif"),  "image/gif")
+  expect_equal(favicon_mime("/favicon.jpg"),  "image/jpeg")
+  expect_equal(favicon_mime("/favicon.jpeg"), "image/jpeg")
   expect_equal(favicon_mime("/favicon.ico", "image/png"), "image/png")
 })
 

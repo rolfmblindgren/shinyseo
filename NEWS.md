@@ -32,6 +32,9 @@
   question still removes the manifest-related fields, since that is an
   explicit choice.
 
+- `favicon_mime()` now recognises `.jpg`/`.jpeg` favicons as `image/jpeg`
+  instead of falling back to `image/x-icon`.
+
 - `DESCRIPTION` no longer declares `LazyData` (the package has no data
   directory), and its `URL`/`BugReports` now point at the package's actual
   GitHub repository.

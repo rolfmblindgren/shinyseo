@@ -19,6 +19,8 @@ favicon_mime <- function(path, explicit_type = NULL) {
     svg  = "image/svg+xml",
     webp = "image/webp",
     gif  = "image/gif",
+    jpg  = ,
+    jpeg = "image/jpeg",
     "image/x-icon"
   )
 }
