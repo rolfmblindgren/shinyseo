@@ -7,7 +7,9 @@
 #'
 #' @param path File to write the metadata to. Defaults to \code{"meta.yml"}.
 #'   If the file already exists, its current values are shown as defaults —
-#'   press Enter on any field to keep what's already there.
+#'   press Enter on any field to keep what's already there. Fields the wizard
+#'   does not ask about (verification codes, \code{robots}, \code{custom}
+#'   tags, and so on) are carried over from the existing file untouched.
 #' @return The path to the written file, invisibly.
 #' @export
 init_meta <- function(path = "meta.yml") {
@@ -23,7 +25,9 @@ init_meta <- function(path = "meta.yml") {
     message("Let's set up your metadata. Press Enter to skip an optional field.\n")
   }
 
-  meta <- list()
+  # Start from the existing file so fields the wizard does not ask about
+  # (verification codes, robots, custom tags, ...) survive a re-run.
+  meta <- existing
 
   meta$title       <- ask_field("Title (required)", default = existing$title, required = TRUE)
   meta$description <- ask_field("Description (required)", default = existing$description, required = TRUE)
@@ -50,6 +54,13 @@ init_meta <- function(path = "meta.yml") {
     meta$apple_mobile_web_app_capable <- TRUE
     meta$apple_mobile_web_app_title <- ask_field("Home screen title (optional, defaults to the short name or title)", default = existing$apple_mobile_web_app_title)
     message("Note: call write_manifest() once at startup (e.g. in global.R) to generate manifest.json.")
+  } else {
+    # Declining the PWA question is an explicit choice; drop the fields
+    # rather than carry them over from the existing file.
+    meta$manifest <- NULL
+    meta$short_name <- NULL
+    meta$apple_mobile_web_app_capable <- NULL
+    meta$apple_mobile_web_app_title <- NULL
   }
 
   meta$twitter_site    <- ask_field("Twitter/X site handle, e.g. @example (optional)", default = existing$twitter_site)

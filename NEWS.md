@@ -25,6 +25,13 @@
 
 ## Bug fixes
 
+- `init_meta()` no longer discards fields it does not ask about. Re-running
+  the wizard on an existing `meta.yml` used to silently drop hand-added
+  fields such as `google_site_verification`, `robots`, `image_alt`, and
+  `custom`; they are now carried over untouched. Answering "no" to the PWA
+  question still removes the manifest-related fields, since that is an
+  explicit choice.
+
 - `DESCRIPTION` no longer declares `LazyData` (the package has no data
   directory), and its `URL`/`BugReports` now point at the package's actual
   GitHub repository.

@@ -91,6 +91,78 @@ test_that("init_meta offers existing values as defaults and keeps them on Enter"
   expect_true(any(grepl("#000000", prompts, fixed = TRUE)))
 })
 
+test_that("init_meta preserves fields it does not ask about", {
+  tmp <- tempfile()
+  dir.create(tmp)
+  on.exit(unlink(tmp, recursive = TRUE), add = TRUE)
+  dest <- file.path(tmp, "meta.yml")
+
+  yaml::write_yaml(list(
+    title       = "Old title",
+    description = "Old description",
+    url         = "https://old.example.no",
+    image       = "https://old.example.no/x.png",
+    google_site_verification = "tok-123",
+    robots      = "noindex",
+    image_alt   = "A picture of the app",
+    custom      = list(list(name = "author", content = "Example Author"))
+  ), dest)
+
+  testthat::local_mocked_bindings(
+    is_interactive = function() TRUE,
+    ask_console    = function(prompt = "") ""
+  )
+
+  suppressMessages(init_meta(dest))
+
+  meta <- yaml::read_yaml(dest)
+
+  expect_equal(meta$google_site_verification, "tok-123")
+  expect_equal(meta$robots, "noindex")
+  expect_equal(meta$image_alt, "A picture of the app")
+  expect_equal(meta$custom[[1]]$content, "Example Author")
+  expect_equal(meta$title, "Old title")
+})
+
+test_that("init_meta drops manifest fields when the PWA question is declined", {
+  tmp <- tempfile()
+  dir.create(tmp)
+  on.exit(unlink(tmp, recursive = TRUE), add = TRUE)
+  dest <- file.path(tmp, "meta.yml")
+
+  yaml::write_yaml(list(
+    title       = "Old title",
+    description = "Old description",
+    url         = "https://old.example.no",
+    image       = "https://old.example.no/x.png",
+    manifest    = "/manifest.json",
+    short_name  = "Old",
+    apple_mobile_web_app_capable = TRUE,
+    apple_mobile_web_app_title   = "Old"
+  ), dest)
+
+  answers <- c(
+    rep("", 9), # keep everything up to the PWA question
+    "n",        # PWA? no
+    "", ""      # twitter_site, twitter_creator
+  )
+  i <- 0
+  testthat::local_mocked_bindings(
+    is_interactive = function() TRUE,
+    ask_console    = function(prompt = "") { i <<- i + 1; answers[[i]] }
+  )
+
+  suppressMessages(init_meta(dest))
+
+  meta <- yaml::read_yaml(dest)
+
+  expect_null(meta$manifest)
+  expect_null(meta$short_name)
+  expect_null(meta$apple_mobile_web_app_capable)
+  expect_null(meta$apple_mobile_web_app_title)
+  expect_equal(meta$title, "Old title")
+})
+
 test_that("init_meta requires an interactive session", {
   testthat::local_mocked_bindings(is_interactive = function() FALSE)
 
