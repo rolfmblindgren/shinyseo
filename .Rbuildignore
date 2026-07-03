@@ -12,3 +12,4 @@
 ^\.claude$
 ^\.github$
 ^LLM\.md$
+^CLAUDE\.md$

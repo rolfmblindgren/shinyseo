@@ -23,6 +23,12 @@
   image-generation API (it can see images but not generate them), so no
   "Claude generator" is shipped or planned as a parallel to the OpenAI one.
 
+## Bug fixes
+
+- `DESCRIPTION` no longer declares `LazyData` (the package has no data
+  directory), and its `URL`/`BugReports` now point at the package's actual
+  GitHub repository.
+
 # shinyseo 1.1.0
 
 ## New feature
