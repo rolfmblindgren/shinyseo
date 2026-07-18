@@ -33,6 +33,19 @@ root (or via `Rscript -e '...'`):
 There is no separate lint/format command; follow the existing style (see
 below) when editing.
 
+## Release process
+
+- `.github/workflows/R-CMD-check.yaml` runs the CRAN-style check weekly
+  (Sunday 06:00 UTC cron) on ubuntu + macOS, not on every push/PR.
+- `.github/workflows/release.yaml` fires on `v*` tag pushes: it re-runs the
+  check, builds the tarball on macOS, and uploads it to a GitHub Release.
+  Cutting a release means bumping `Version` in `DESCRIPTION`, updating
+  `NEWS.md`, and pushing a matching `vX.Y.Z` tag.
+- `cran-comments.md` is the CRAN-submission cover note (check results,
+  summary of changes since the last CRAN version, notes on any
+  network/API-touching code). Refresh it before every CRAN submission —
+  see recent commit history for the expected tone and level of detail.
+
 ## Architecture
 
 The package has a small, linear pipeline. Most exported entry points

@@ -59,7 +59,7 @@ When you call `social_meta()`, the package:
 
 - `meta` may be a YAML path or a named list
 - `title`, `description`, `url`, and `image` are required
-- if `meta` is a character string, it is read with `yaml::read_yaml()`
+- if `meta` is a character string, it is read as a UTF-8 YAML file path
 - missing keys use package defaults where provided
 - `schema = FALSE` disables JSON-LD output
 - any other value of `schema` keeps JSON-LD enabled
@@ -117,8 +117,8 @@ yaml::write_yaml(meta, "meta.yml")
   generate images at all (e.g. Claude/Anthropic, which can *see* images but
   not generate them) or need enough vendor-specific glue that they're
   better suited to a community-contributed `generator` — see
-  [LLM.md](LLM.md#contributing-a-generator) for the shape a contribution
-  should take
+  [LLM.md](https://github.com/rolfmblindgren/shinyseo/blob/main/LLM.md#contributing-a-generator)
+  for the shape a contribution should take
 
 ```r
 meta <- shinyseo::generate_assets(meta,
@@ -243,4 +243,4 @@ The long-form package docs live in vignettes:
 
 If the package is installed, you can also open them with `browseVignettes("shinyseo")`.
 
-For LLM use, see [LLM.md](LLM.md).
+For LLM use, see [LLM.md](https://github.com/rolfmblindgren/shinyseo/blob/main/LLM.md).
