@@ -3,6 +3,8 @@
 [![CRAN version](https://www.r-pkg.org/badges/version/shinyseo)](https://CRAN.R-project.org/package=shinyseo)
 [![CRAN total downloads](https://cranlogs.r-pkg.org/badges/grand-total/shinyseo?color=blue)](https://CRAN.R-project.org/package=shinyseo)
 
+![shinyseo 1.2.0 has passed 1,000 downloads](man/figures/shinyseo-1.2.0-downloads.png)
+
 `shinyseo` is a small helper package for Shiny apps that need social, search, and PWA metadata.
 
 It builds one `shiny::tags$head()` fragment containing:
@@ -16,6 +18,12 @@ It builds one `shiny::tags$head()` fragment containing:
 - arbitrary custom meta tags
 
 The package accepts either a YAML file path or a named list.
+
+## Support
+
+If `shinyseo` helps your Shiny apps, you can support development here:
+
+[Support shinyseo via Stripe](https://buy.stripe.com/7sY28s9CQ7HBgGabY5aEE01)
 
 Six exported functions:
 
