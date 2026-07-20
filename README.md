@@ -2,6 +2,8 @@
 
 [![CRAN version](https://www.r-pkg.org/badges/version/shinyseo)](https://CRAN.R-project.org/package=shinyseo)
 [![CRAN total downloads](https://cranlogs.r-pkg.org/badges/grand-total/shinyseo?color=blue)](https://CRAN.R-project.org/package=shinyseo)
+[![Static Badge](https://img.shields.io/badge/donations-stripe-cyan)](https://buy.stripe.com/7sY28s9CQ7HBgGabY5aEE01)
+
 
 ![shinyseo 1.2.0 has passed 1,000 downloads](man/figures/shinyseo-1.2.0-downloads.png)
 
