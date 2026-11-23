@@ -2,7 +2,7 @@
 #'
 #' @param meta Either a path to a YAML file or a named list. The final
 #'   metadata must include \code{title}, \code{description}, \code{url}, and
-#'   \code{image}.
+#'   \code{image}, each as a non-blank character string.
 #' @return A \code{shiny::tags$head()} fragment containing canonical, Open
 #'   Graph, Twitter Card, and optional schema.org metadata.
 #' @details If \code{meta} is a character string, it is treated as a YAML file
@@ -42,6 +42,15 @@ social_meta <- function(meta) {
   missing <- setdiff(required, names(meta))
   if (length(missing)) {
     stop("Missing required meta fields: ", paste(missing, collapse = ", "))
+  }
+
+  valid <- vapply(meta[required], function(value) {
+    is.character(value) && length(value) == 1L &&
+      !is.na(value) && grepl("[^[:space:]]", value)
+  }, logical(1))
+  if (any(!valid)) {
+    stop("Required meta fields must be non-blank character strings: ",
+         paste(required[!valid], collapse = ", "))
   }
 
   schema <- build_schema_meta(meta)
