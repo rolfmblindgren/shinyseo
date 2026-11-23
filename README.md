@@ -219,23 +219,55 @@ If you use GA4, keep that in your server or deployment config instead of in
 
 ## Quick use
 
-```r
-# global.R — generate manifest once at startup
-shinyseo::write_manifest("meta.yml")
+Save this as `app.R` and run `shiny::runApp()` from its directory. Before
+deploying, replace the example URLs with your public app and preview image
+URLs.
 
-# ui.R
+```r
+library(shiny)
+
+app_title <- "Motor Trend car data"
+description <- "Explore fuel economy and weight for 32 cars in the Motor Trend dataset."
+canonical_url <- "https://example.no/car-data/"
+
 ui <- fluidPage(
-  shinyseo::social_meta("meta.yml"),
-  h1("My app")
+  title = app_title,
+  shinyseo::social_meta(list(
+    title = app_title,
+    description = description,
+    url = canonical_url,
+    image = "https://example.no/car-data/preview.png"
+  )),
+  h1(app_title),
+  p(description),
+  tabsetPanel(
+    id = "view",
+    tabPanel("Chart", plotOutput("fuel_economy")),
+    tabPanel("Data", tableOutput("cars"))
+  )
 )
 
-# server.R — update browser metadata when the user switches tabs
 server <- function(input, output, session) {
-  observeEvent(input$tabs, {
-    shinyseo::update_meta(session, title = paste(input$tabs, "– My App"))
+  output$fuel_economy <- renderPlot({
+    plot(mtcars$wt, mtcars$mpg,
+         xlab = "Weight (1,000 lb)", ylab = "Miles per gallon")
   })
+  output$cars <- renderTable(mtcars[c("mpg", "wt")], rownames = TRUE)
+
+  observeEvent(input$view, {
+    shinyseo::update_meta(session, title = paste(input$view, "|", app_title))
+  }, ignoreInit = TRUE)
 }
+
+shinyApp(ui, server)
 ```
+
+`fluidPage(title = app_title)` sets the HTML `<title>`, and `h1(app_title)`
+provides the visible heading. The title, heading, description, and canonical
+link are all present in the initial HTML. Switching tabs updates the browser
+title while keeping the same canonical URL. If a view needs its own search
+result, give it a directly accessible URL and serve its own title, content,
+and canonical link in the initial response.
 
 You can also pass a list directly instead of a YAML file:
 
