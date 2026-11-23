@@ -6,7 +6,7 @@
 [![Static Badge](https://img.shields.io/badge/donations-stripe-cyan)](https://buy.stripe.com/7sY28s9CQ7HBgGabY5aEE01)
 
 
-![shinyseo 1.2.0 has passed 2,000 downloads](man/figures/ShinySEO banner with 2,000+ downloads.png)
+![shinyseo 1.2.0 has passed 2,000 downloads](<man/figures/ShinySEO banner with 2,000+ downloads.png>)
 
 `shinyseo` is a small helper package for Shiny apps that need social, search, and PWA metadata.
 
