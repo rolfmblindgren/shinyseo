@@ -36,5 +36,7 @@ Called for its side-effect; returns \code{invisible(NULL)}.
 Call this inside a Shiny \code{server} function to update one or more
 metadata fields after the page has loaded — for example when the user
 navigates between tabs or routes.  Only the fields you supply are changed;
-all others stay at whatever value \code{social_meta()} set at startup.
+all others keep their current values. These updates affect only the live
+browser document. For URLs that need distinct search or social previews,
+set their metadata with \code{social_meta()} in the initial HTML response.
 }

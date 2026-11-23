@@ -9,7 +9,7 @@ social_meta(meta)
 \arguments{
 \item{meta}{Either a path to a YAML file or a named list. The final
 metadata must include \code{title}, \code{description}, \code{url}, and
-\code{image}.}
+\code{image}, each as a non-blank character string.}
 }
 \value{
 A \code{shiny::tags$head()} fragment containing canonical, Open

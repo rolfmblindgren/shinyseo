@@ -1,3 +1,12 @@
+# shinyseo development version
+
+- `social_meta()` rejects blank, NA, or non-string values for its
+  four required fields.
+- Clarified that `update_meta()` changes the live browser document and that
+  URL-specific metadata for crawlers belongs in the initial HTML response.
+- Documented the OpenAI generator's output sizes and adjusted the share-image
+  prompt to allow for cropping to a wider format.
+
 # shinyseo 1.2.0
 
 ## New features
