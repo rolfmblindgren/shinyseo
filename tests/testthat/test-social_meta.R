@@ -37,6 +37,21 @@ test_that("social_meta validates required fields", {
   )
 })
 
+test_that("social_meta rejects invalid required field values", {
+  meta <- list(
+    title = "App",
+    description = "Description",
+    url = "https://example.no",
+    image = "/share.png"
+  )
+
+  meta$title <- " \t"
+  meta$description <- NA_character_
+  meta$url <- c("https://example.no", "https://example.org")
+  meta$image <- 42
+  expect_error(social_meta(meta), "non-blank character strings: title, description, url, image")
+})
+
 test_that("schema can be disabled", {
   html <- htmltools::renderTags(social_meta(list(
     title = "No schema",

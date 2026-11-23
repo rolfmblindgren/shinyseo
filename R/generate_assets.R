@@ -69,7 +69,7 @@ asset_prompt <- function(kind, meta) {
       blurb, " Bold, simple, and legible at small sizes, no text."
     ),
     image = paste0(
-      "A wide social share image (1200x630) for \"", subject, "\". ",
+      "A wide social share image for \"", subject, "\". ",
       blurb, " Suitable for Open Graph and Twitter Card link previews."
     )
   )

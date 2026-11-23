@@ -224,6 +224,8 @@ Parameters:
 
 `update_meta(session, title, description, url, image)` sends a custom message to the browser that updates the live DOM without a page reload.  It is intended for multi-page or tabbed Shiny apps where the metadata should reflect the current view.
 
+For URLs that need distinct search or social previews, send the corresponding metadata in the initial HTML response with `social_meta()`.
+
 ### Parameters
 
 - `session` — the Shiny `session` object passed to `server`.

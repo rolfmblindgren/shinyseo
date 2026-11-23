@@ -203,7 +203,9 @@ If `favicon` is an SVG, also set `favicon_png` (optionally with `favicon_png_siz
 
 ## Reactive metadata with `update_meta()`
 
-Call `update_meta()` in the server when the visible content changes — for example when the user switches tabs or navigates between routes.  Only the fields you supply are updated; everything else stays as set by `social_meta()`.
+Call `update_meta()` in the server when the visible content changes — for example when the user switches tabs or navigates between routes.  Only the fields you supply are updated. Other fields retain their current values.
+
+For URLs that need distinct search or social previews, send the corresponding metadata in the initial HTML response with `social_meta()`.
 
 ```r
 ui <- shiny::navbarPage("My App",

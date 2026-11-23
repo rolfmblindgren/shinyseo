@@ -41,6 +41,8 @@ Call this in the **server** to update metadata without a page reload.
 `social_meta()` must be present in the UI — it registers the JavaScript
 handler that `update_meta()` depends on.
 
+For URLs that need distinct search or social previews, send the corresponding metadata in the initial HTML response with `social_meta()`.
+
 All arguments except `session` are optional.  Only supplied fields change;
 omitted fields keep their current values.  Passing no fields is a no-op.
 

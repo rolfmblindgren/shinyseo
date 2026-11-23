@@ -23,6 +23,9 @@
 #' @return A function \code{function(prompt, kind)} that POSTs to
 #'   \code{https://api.openai.com/v1/images/generations} and returns the
 #'   generated image as a raw vector of bytes.
+#' @details Requests 1536 × 1024 pixels for share images and 1024 × 1024
+#'   pixels for icons. The returned image is used as-is. Crop and resize it
+#'   separately if you need exact dimensions such as 1200 × 630.
 #' @export
 openai_image_generator <- function(api_key = Sys.getenv("OPENAI_API_KEY"),
                                    model = "gpt-image-1") {
@@ -42,6 +45,11 @@ openai_image_generator <- function(api_key = Sys.getenv("OPENAI_API_KEY"),
       image            = "1536x1024",
       stop("Unknown asset kind: ", kind)
     )
+
+    if (identical(kind, "image")) {
+      prompt <- paste(prompt, "Keep key elements near the center so the image",
+                      "can be cropped to a wider aspect ratio.")
+    }
 
     response <- httr::POST(
       "https://api.openai.com/v1/images/generations",

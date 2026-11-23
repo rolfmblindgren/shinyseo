@@ -38,4 +38,8 @@ Calling this function does not make any network request -- it only builds
 and returns the generator. The 'httr' package is required, but only
 loaded (via \code{requireNamespace()}) when you call this constructor, so
 it costs nothing if you never use OpenAI generation.
+
+Requests 1536 × 1024 pixels for share images and 1024 × 1024
+  pixels for icons. The returned image is used as-is. Crop and resize it
+  separately if you need exact dimensions such as 1200 × 630.
 }

@@ -68,7 +68,7 @@ When you call `social_meta()`, the package:
 `social_meta(meta)`:
 
 - `meta` may be a YAML path or a named list
-- `title`, `description`, `url`, and `image` are required
+- `title`, `description`, `url`, and `image` must each be a non-blank string
 - if `meta` is a character string, it is read as a UTF-8 YAML file path
 - missing keys use package defaults where provided
 - `schema = FALSE` disables JSON-LD output
@@ -79,6 +79,9 @@ When you call `social_meta()`, the package:
 - call from the server to update metadata without a page reload
 - only the fields you supply are changed
 - requires `social_meta()` to be present in the UI
+- updates the live browser document. For URLs that need distinct search or
+  social previews, use `social_meta()` to send each URL’s metadata in its
+  initial HTML response
 
 `write_manifest(meta, path, display, start_url, background_color)`:
 
@@ -119,6 +122,9 @@ yaml::write_yaml(meta, "meta.yml")
 - builds a ready-made `generator` for `generate_assets()` that calls
   OpenAI's image API (`gpt-image-1` by default) and returns the generated
   image bytes
+- requests 1536 × 1024 pixels for share images and 1024 × 1024 pixels for
+  icons. Crop and resize the result separately if you need exact dimensions
+  such as 1200 × 630
 - `api_key` defaults to the `OPENAI_API_KEY` environment variable
 - requires the `httr` package, but only loads it (via `requireNamespace()`)
   when you call this constructor — it costs nothing if you never use it
@@ -223,7 +229,7 @@ ui <- fluidPage(
   h1("My app")
 )
 
-# server.R — update metadata when the user navigates
+# server.R — update browser metadata when the user switches tabs
 server <- function(input, output, session) {
   observeEvent(input$tabs, {
     shinyseo::update_meta(session, title = paste(input$tabs, "– My App"))
@@ -254,3 +260,10 @@ The long-form package docs live in vignettes:
 If the package is installed, you can also open them with `browseVignettes("shinyseo")`.
 
 For LLM use, see [LLM.md](https://github.com/rolfmblindgren/shinyseo/blob/main/LLM.md).
+
+## Coda
+
+A Shiny app steps out into the light.  
+Its name and purpose greet the human eye.  
+A little tag can set a link aright.  
+And pages find their readers by and by.  
